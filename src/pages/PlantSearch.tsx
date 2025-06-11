@@ -425,7 +425,7 @@ const PlantSearch: React.FC = () => {
           </AccordionSummary>
           <AccordionDetails>
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6} md={4}>
+              <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                 <FormControl fullWidth>
                   <InputLabel>Plant Cycle</InputLabel>
                   <Select
@@ -441,7 +441,7 @@ const PlantSearch: React.FC = () => {
                 </FormControl>
               </Grid>
               
-              <Grid item xs={12} sm={6} md={4}>
+              <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                 <FormControl fullWidth>
                   <InputLabel>Watering Needs</InputLabel>
                   <Select
@@ -457,7 +457,7 @@ const PlantSearch: React.FC = () => {
                 </FormControl>
               </Grid>
               
-              <Grid item xs={12} sm={6} md={4}>
+              <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                 <FormControl fullWidth>
                   <InputLabel>Sunlight Requirements</InputLabel>
                   <Select
@@ -473,7 +473,7 @@ const PlantSearch: React.FC = () => {
                 </FormControl>
               </Grid>
               
-              <Grid item xs={12} sm={6} md={4}>
+              <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                 <FormControl fullWidth>
                   <InputLabel>Hardiness Zone</InputLabel>
                   <Select
@@ -488,7 +488,7 @@ const PlantSearch: React.FC = () => {
                 </FormControl>
               </Grid>
               
-              <Grid item xs={12} sm={6} md={4}>
+              <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                 <FormControlLabel
                   control={
                     <Switch
@@ -500,7 +500,7 @@ const PlantSearch: React.FC = () => {
                 />
               </Grid>
               
-              <Grid item xs={12} sm={6} md={4}>
+              <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                 <FormControlLabel
                   control={
                     <Switch
@@ -512,7 +512,7 @@ const PlantSearch: React.FC = () => {
                 />
               </Grid>
               
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <Box sx={{ display: 'flex', gap: 1 }}>
                   <Button variant="contained" onClick={handleSearch} disabled={loading}>
                     Apply Filters
