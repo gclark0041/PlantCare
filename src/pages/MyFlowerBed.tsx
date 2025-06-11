@@ -9,7 +9,6 @@ import {
   CardMedia,
   Grid,
   IconButton,
-  Fab,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -21,7 +20,6 @@ import {
   MenuItem,
   Switch,
   FormControlLabel,
-  Alert,
   Avatar,
   List,
   ListItem,
@@ -65,8 +63,8 @@ const MyFlowerBed: React.FC = () => {
   const navigate = useNavigate();
   const [plants, setPlants] = useState<Plant[]>([]);
   const [showPersonalizationDialog, setShowPersonalizationDialog] = useState(false);
-  const [showPlantDialog, setShowPlantDialog] = useState(false);
-  const [editingPlant, setEditingPlant] = useState<Plant | null>(null);
+  // const [showPlantDialog, setShowPlantDialog] = useState(false);
+  // const [editingPlant, setEditingPlant] = useState<Plant | null>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedPlant, setSelectedPlant] = useState<Plant | null>(null);
   const [personalization, setPersonalization] = useState<PersonalizationSettings>({
@@ -111,8 +109,9 @@ const MyFlowerBed: React.FC = () => {
 
   const handleEditPlant = () => {
     if (selectedPlant) {
-      setEditingPlant(selectedPlant);
-      setShowPlantDialog(true);
+      // setEditingPlant(selectedPlant);
+      // setShowPlantDialog(true);
+      // TODO: Implement plant editing functionality
     }
     handleMenuClose();
   };

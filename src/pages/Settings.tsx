@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Container,
   Typography,
@@ -7,17 +7,13 @@ import {
   CardContent,
   List,
   ListItem,
-  ListItemIcon,
   ListItemText,
   Switch,
-  FormControlLabel,
   TextField,
   Button,
-  Divider,
 } from '@mui/material';
 import {
   Notifications as NotificationsIcon,
-  Palette as ThemeIcon,
   LocationOn as LocationIcon,
   Info as InfoIcon,
 } from '@mui/icons-material';
