@@ -11,7 +11,6 @@ import {
   Button,
   Grid,
   InputAdornment,
-  CircularProgress,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -38,14 +37,12 @@ import {
   LocalFlorist as PlantIcon,
   WbSunny as SunIcon,
   WaterDrop as WaterIcon,
-  Info as InfoIcon,
   Close as CloseIcon,
   FilterList as FilterIcon,
   ExpandMore as ExpandMoreIcon,
   Restaurant as EdibleIcon,
   Warning as PoisonIcon,
   Home as IndoorIcon,
-  Thermostat as HardinessIcon,
 } from '@mui/icons-material';
 import { plantApiService, PlantSearchFilters } from '../services/plantApi';
 import { localStorageService } from '../services/localStorage';
