@@ -3,7 +3,7 @@ import { PlantSearchResult, PlantDetails, WeatherData } from '../types';
 
 // Using Perenual API (free tier) for plant information
 const PERENUAL_API_KEY = process.env.REACT_APP_PERENUAL_API_KEY || 'sk-Ej5867b4a5a4fa0b67690';
-const PERENUAL_BASE_URL = 'https://perenual.com/api';
+const PERENUAL_BASE_URL = 'https://perenual.com/api/v2';
 
 // OpenWeatherMap API for weather-based care recommendations
 const WEATHER_API_KEY = process.env.REACT_APP_WEATHER_API_KEY || 'demo_key';
@@ -65,6 +65,12 @@ class PlantApiService {
 
       const response = await this.perenualApi.get('/species-list', { params });
 
+      // Check if response has data
+      if (!response.data || !response.data.data || !Array.isArray(response.data.data)) {
+        console.warn('Invalid API response structure:', response.data);
+        return this.getMockPlants(filters.query || '');
+      }
+
       return response.data.data.map((plant: any) => ({
         id: plant.id,
         common_name: plant.common_name,
@@ -84,6 +90,11 @@ class PlantApiService {
       }));
     } catch (error) {
       console.error('Error searching plants:', error);
+      if (axios.isAxiosError(error)) {
+        console.error('API Error Status:', error.response?.status);
+        console.error('API Error Data:', error.response?.data);
+        console.error('API Error Config:', error.config?.url);
+      }
       // Return mock data if API fails
       return this.getMockPlants(filters.query || '');
     }

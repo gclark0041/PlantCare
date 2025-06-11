@@ -4,13 +4,13 @@
   "description": "A comprehensive plant care application for managing your personal garden",
   "icons": [
     {
-      "src": "plant-icon-192.png",
+      "src": "logo192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "plant-icon-512.png",
+      "src": "logo512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
