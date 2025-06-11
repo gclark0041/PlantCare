@@ -8,7 +8,6 @@ import {
   Grid,
   Avatar,
   Chip,
-  IconButton,
   List,
   ListItem,
   ListItemText,

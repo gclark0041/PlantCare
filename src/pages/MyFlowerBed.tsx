@@ -36,8 +36,6 @@ import {
   Delete as DeleteIcon,
   WaterDrop as WaterIcon,
   LocalFlorist as PlantIcon,
-  PhotoCamera as PhotoIcon,
-  Settings as SettingsIcon,
   Palette as PaletteIcon,
   ViewModule as ViewIcon,
   ViewList as ListIcon,

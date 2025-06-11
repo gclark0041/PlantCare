@@ -21,7 +21,6 @@ import {
   Tabs,
   Tab,
   Alert,
-  Checkbox,
   Divider,
 } from '@mui/material';
 import {
@@ -30,7 +29,6 @@ import {
   ContentCut as PruningIcon,
   Schedule as ScheduleIcon,
   Check as CheckIcon,
-  Add as AddIcon,
   Warning as WarningIcon,
 } from '@mui/icons-material';
 import { localStorageService } from '../services/localStorage';
