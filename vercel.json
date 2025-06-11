@@ -34,10 +34,7 @@
       "dest": "/index.html"
     }
   ],
-  "env": {
-    "REACT_APP_PERENUAL_API_KEY": "@perenual_api_key",
-    "REACT_APP_WEATHER_API_KEY": "@weather_api_key"
-  },
+
   "github": {
     "repository": "gclark0041/PlantCare"
   }
