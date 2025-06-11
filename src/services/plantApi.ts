@@ -9,6 +9,27 @@ const PERENUAL_BASE_URL = 'https://perenual.com/api';
 const WEATHER_API_KEY = process.env.REACT_APP_WEATHER_API_KEY || 'demo_key';
 const WEATHER_BASE_URL = 'https://api.openweathermap.org/data/2.5';
 
+// Enhanced search filters using Perenual API capabilities
+export interface PlantSearchFilters {
+  query?: string;
+  page?: number;
+  edible?: boolean;
+  poisonous?: boolean;
+  cycle?: 'perennial' | 'annual' | 'biennial' | 'biannual';
+  watering?: 'frequent' | 'average' | 'minimum' | 'none';
+  sunlight?: 'full_shade' | 'part_shade' | 'sun-part_shade' | 'full_sun';
+  indoor?: boolean;
+  hardiness?: number; // 1-13
+  order?: 'asc' | 'desc';
+}
+
+export interface HardinessZone {
+  zone: number;
+  description: string;
+  temperatureRange: string;
+  suitable: boolean;
+}
+
 class PlantApiService {
   private perenualApi = axios.create({
     baseURL: PERENUAL_BASE_URL,
@@ -25,15 +46,24 @@ class PlantApiService {
     },
   });
 
-  async searchPlants(query: string, page: number = 1): Promise<PlantSearchResult[]> {
+  // Enhanced search with full Perenual API filtering capabilities
+  async searchPlants(filters: PlantSearchFilters = {}): Promise<PlantSearchResult[]> {
     try {
-      const response = await this.perenualApi.get('/species-list', {
-        params: {
-          q: query,
-          page,
-          indoor: 1, // Focus on plants suitable for indoor growing
-        },
-      });
+      const params: any = {};
+      
+      // Build dynamic params based on filters
+      if (filters.query) params.q = filters.query;
+      if (filters.page) params.page = filters.page;
+      if (filters.edible !== undefined) params.edible = filters.edible ? 1 : 0;
+      if (filters.poisonous !== undefined) params.poisonous = filters.poisonous ? 1 : 0;
+      if (filters.cycle) params.cycle = filters.cycle;
+      if (filters.watering) params.watering = filters.watering;
+      if (filters.sunlight) params.sunlight = filters.sunlight;
+      if (filters.indoor !== undefined) params.indoor = filters.indoor ? 1 : 0;
+      if (filters.hardiness) params.hardiness = filters.hardiness;
+      if (filters.order) params.order = filters.order;
+
+      const response = await this.perenualApi.get('/species-list', { params });
 
       return response.data.data.map((plant: any) => ({
         id: plant.id,
@@ -44,18 +74,87 @@ class PlantApiService {
         watering: plant.watering,
         sunlight: plant.sunlight,
         default_image: plant.default_image,
+        // Enhanced fields from API
+        family: plant.family,
+        edible_leaf: plant.edible_leaf,
+        poisonous_to_humans: plant.poisonous_to_humans,
+        poisonous_to_pets: plant.poisonous_to_pets,
+        indoor: plant.indoor,
+        care_level: plant.care_level,
       }));
     } catch (error) {
       console.error('Error searching plants:', error);
       // Return mock data if API fails
-      return this.getMockPlants(query);
+      return this.getMockPlants(filters.query || '');
     }
   }
 
+  // New method: Get hardiness zone information for a plant
+  async getPlantHardinessZone(speciesId: number): Promise<HardinessZone | null> {
+    try {
+      const response = await this.perenualApi.get('/hardiness-map', {
+        params: { species_id: speciesId }
+      });
+      
+      return {
+        zone: response.data.hardiness_zone,
+        description: response.data.description,
+        temperatureRange: response.data.temperature_range,
+        suitable: response.data.suitable_for_location,
+      };
+    } catch (error) {
+      console.error('Error fetching hardiness zone:', error);
+      return null;
+    }
+  }
+
+  // Enhanced search methods for specific use cases
+  async searchIndoorPlants(query?: string, page: number = 1): Promise<PlantSearchResult[]> {
+    return this.searchPlants({
+      query,
+      page,
+      indoor: true,
+      order: 'asc'
+    });
+  }
+
+  async searchEdiblePlants(query?: string, page: number = 1): Promise<PlantSearchResult[]> {
+    return this.searchPlants({
+      query,
+      page,
+      edible: true,
+      poisonous: false, // Safety first!
+      order: 'asc'
+    });
+  }
+
+  async searchLowMaintenancePlants(query?: string, page: number = 1): Promise<PlantSearchResult[]> {
+    return this.searchPlants({
+      query,
+      page,
+      watering: 'minimum',
+      sunlight: 'part_shade',
+      order: 'asc'
+    });
+  }
+
+  async searchByClimateZone(zone: number, query?: string, page: number = 1): Promise<PlantSearchResult[]> {
+    return this.searchPlants({
+      query,
+      page,
+      hardiness: zone,
+      order: 'asc'
+    });
+  }
+
+  // Original methods with enhancements
   async getPlantDetails(plantId: number): Promise<PlantDetails | null> {
     try {
       const response = await this.perenualApi.get(`/species/details/${plantId}`);
       const plant = response.data;
+
+      // Also get hardiness info
+      const hardinessInfo = await this.getPlantHardinessZone(plantId);
 
       return {
         id: plant.id,
@@ -71,11 +170,22 @@ class PlantApiService {
         dimension: plant.dimension,
         type: plant.type,
         hardiness: plant.hardiness,
+        hardiness_zone: hardinessInfo, // Enhanced with zone info
         care_level: plant.care_level,
         growth_rate: plant.growth_rate,
         maintenance: plant.maintenance,
         care_guides: plant.care_guides,
         problem_solving: plant.problem_solving,
+        // Safety information
+        poisonous_to_humans: plant.poisonous_to_humans,
+        poisonous_to_pets: plant.poisonous_to_pets,
+        edible_leaf: plant.edible_leaf,
+        indoor: plant.indoor,
+        drought_tolerant: plant.drought_tolerant,
+        salt_tolerant: plant.salt_tolerant,
+        flowers: plant.flowers,
+        flowering_season: plant.flowering_season,
+        medicinal: plant.medicinal,
       };
     } catch (error) {
       console.error('Error fetching plant details:', error);

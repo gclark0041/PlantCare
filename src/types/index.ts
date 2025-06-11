@@ -53,6 +53,13 @@ export interface CareTask {
   isOverdue: boolean;
 }
 
+export interface HardinessZone {
+  zone: number;
+  description: string;
+  temperatureRange: string;
+  suitable: boolean;
+}
+
 export interface PlantSearchResult {
   id: number;
   common_name: string;
@@ -66,10 +73,16 @@ export interface PlantSearchResult {
     medium_url: string;
     regular_url: string;
   };
+  // Enhanced fields from Perenual API
+  family?: string;
+  edible_leaf?: boolean;
+  poisonous_to_humans?: boolean;
+  poisonous_to_pets?: boolean;
+  indoor?: boolean;
+  care_level?: string;
 }
 
 export interface PlantDetails extends PlantSearchResult {
-  family?: string;
   origin?: string[];
   dimension?: string;
   type?: string;
@@ -77,11 +90,17 @@ export interface PlantDetails extends PlantSearchResult {
     min: string;
     max: string;
   };
-  care_level?: string;
+  hardiness_zone?: HardinessZone | null;
   growth_rate?: string;
   maintenance?: string;
   care_guides?: string;
   problem_solving?: string;
+  // Additional safety and care information
+  drought_tolerant?: boolean;
+  salt_tolerant?: boolean;
+  flowers?: boolean;
+  flowering_season?: string;
+  medicinal?: boolean;
 }
 
 export interface UserPreferences {
