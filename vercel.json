@@ -32,9 +32,8 @@
     {
       "src": "/(.*)",
       "dest": "/index.html"
-    }
+        }
   ],
-
   "github": {
     "repository": "gclark0041/PlantCare"
   }
