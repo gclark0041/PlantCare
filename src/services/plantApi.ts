@@ -2,7 +2,8 @@ import axios from 'axios';
 import { PlantSearchResult, PlantDetails, WeatherData } from '../types';
 
 // Using Perenual API (free tier) for plant information
-const PERENUAL_API_KEY = process.env.REACT_APP_PERENUAL_API_KEY || 'sk-Ej5867b4a5a4fa0b67690';
+// Note: You need to get your own API key from https://perenual.com/docs/api
+const PERENUAL_API_KEY = process.env.REACT_APP_PERENUAL_API_KEY || null;
 const PERENUAL_BASE_URL = 'https://perenual.com/api/v2';
 
 // OpenWeatherMap API for weather-based care recommendations
@@ -33,9 +34,8 @@ export interface HardinessZone {
 class PlantApiService {
   private perenualApi = axios.create({
     baseURL: PERENUAL_BASE_URL,
-    params: {
-      key: PERENUAL_API_KEY,
-    },
+    timeout: 10000, // 10 second timeout
+    // Note: We'll add the key parameter per request to handle null case
   });
 
   private weatherApi = axios.create({
@@ -48,10 +48,18 @@ class PlantApiService {
 
   // Enhanced search with full Perenual API filtering capabilities
   async searchPlants(filters: PlantSearchFilters = {}): Promise<PlantSearchResult[]> {
+    // Check if API key is available
+    if (!PERENUAL_API_KEY) {
+      console.warn('Perenual API key not found. Using mock data. Get your API key from https://perenual.com/docs/api');
+      return this.getMockPlants(filters.query || '');
+    }
+
     try {
-      const params: any = {};
+      const params: any = {
+        key: PERENUAL_API_KEY // Ensure key is always included
+      };
       
-      // Build dynamic params based on filters
+      // Build dynamic params based on filters - following exact API documentation format
       if (filters.query) params.q = filters.query;
       if (filters.page) params.page = filters.page;
       if (filters.edible !== undefined) params.edible = filters.edible ? 1 : 0;
@@ -63,6 +71,8 @@ class PlantApiService {
       if (filters.hardiness) params.hardiness = filters.hardiness;
       if (filters.order) params.order = filters.order;
 
+      console.log('Making API request to:', `${PERENUAL_BASE_URL}/species-list`, 'with params:', params);
+      
       const response = await this.perenualApi.get('/species-list', { params });
 
       // Check if response has data
@@ -94,6 +104,19 @@ class PlantApiService {
         console.error('API Error Status:', error.response?.status);
         console.error('API Error Data:', error.response?.data);
         console.error('API Error Config:', error.config?.url);
+        
+        // Handle specific error cases
+        if (error.response?.status === 500) {
+          console.error('Perenual API server error (500). This might be due to:');
+          console.error('1. Invalid API key');
+          console.error('2. Server issues on Perenual side');
+          console.error('3. Malformed request parameters');
+          console.error('Get a valid API key from: https://perenual.com/docs/api');
+        } else if (error.response?.status === 401) {
+          console.error('Unauthorized (401): Invalid API key. Get a valid key from https://perenual.com/docs/api');
+        } else if (error.response?.status === 429) {
+          console.error('Rate limited (429): Too many requests. Please wait before trying again.');
+        }
       }
       // Return mock data if API fails
       return this.getMockPlants(filters.query || '');
@@ -101,10 +124,20 @@ class PlantApiService {
   }
 
   // New method: Get hardiness zone information for a plant
+  // Note: This endpoint may not be available in the free tier or v2 API
   async getPlantHardinessZone(speciesId: number): Promise<HardinessZone | null> {
+    if (!PERENUAL_API_KEY) {
+      console.warn('Perenual API key not found for hardiness zone lookup');
+      return null;
+    }
+
     try {
-      const response = await this.perenualApi.get('/hardiness-map', {
-        params: { species_id: speciesId }
+      // Try the hardiness-map endpoint (note: may not be in v2 API)
+      const response = await axios.get(`${PERENUAL_BASE_URL}/hardiness-map`, {
+        params: { 
+          species_id: speciesId,
+          key: PERENUAL_API_KEY
+        }
       });
       
       return {
@@ -114,7 +147,8 @@ class PlantApiService {
         suitable: response.data.suitable_for_location,
       };
     } catch (error) {
-      console.error('Error fetching hardiness zone:', error);
+      console.warn('Hardiness zone endpoint not available or failed:', error);
+      // Hardiness zone feature may not be available in free tier
       return null;
     }
   }
@@ -160,8 +194,15 @@ class PlantApiService {
 
   // Original methods with enhancements
   async getPlantDetails(plantId: number): Promise<PlantDetails | null> {
+    if (!PERENUAL_API_KEY) {
+      console.warn('Perenual API key not found for plant details');
+      return this.getMockPlantDetails(plantId);
+    }
+
     try {
-      const response = await this.perenualApi.get(`/species/details/${plantId}`);
+      const response = await this.perenualApi.get(`/species/details/${plantId}`, {
+        params: { key: PERENUAL_API_KEY }
+      });
       const plant = response.data;
 
       // Also get hardiness info
@@ -205,10 +246,16 @@ class PlantApiService {
   }
 
   async getCareGuide(plantId: number): Promise<any> {
+    if (!PERENUAL_API_KEY) {
+      console.warn('Perenual API key not found for care guide');
+      return null;
+    }
+
     try {
       const response = await this.perenualApi.get(`/species-care-guide-list`, {
         params: {
           species_id: plantId,
+          key: PERENUAL_API_KEY,
         },
       });
       return response.data;
